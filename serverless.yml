@@ -1,0 +1,33 @@
+service: cors-anywhere
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  timeout: 30 # Maximum timeout (15 minutes)
+  memorySize: 10240
+
+functions:
+  proxy:
+    handler: handler.proxy
+    events:
+      - http:
+          path: /{proxy+}
+          method: get
+          cors: true
+
+plugins:
+  - serverless-offline
+
+resources:
+  Resources:
+    GatewayResponse:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
